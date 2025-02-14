@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2025 Rishabh Dwivedi (rishabhdwivedi17@gmail.com)
 
-use crate::{bounding_box::BoundingBox, position::Position};
+use crate::{bounding_box::BoundingBox, point_location::PointLocation, position::Position};
 
 use super::Shape;
 
@@ -10,48 +10,6 @@ pub struct Ellipse {
     pub centre: Position,
     pub semi_major_axis: i32,
     pub semi_minor_axis: i32,
-}
-
-struct EllipseBorderIterator<'a> {
-    ellipse: &'a Ellipse,
-    angle: f64,
-    step: f64,
-}
-
-impl<'a> EllipseBorderIterator<'a> {
-    pub fn new(ellipse: &'a Ellipse) -> Self {
-        Self {
-            ellipse,
-            angle: 0.0,
-            step: 1.0, // Step in degrees
-        }
-    }
-}
-
-impl Iterator for EllipseBorderIterator<'_> {
-    type Item = Position;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.angle >= 360.0 {
-            return None;
-        }
-
-        let h = self.ellipse.centre.x as f64;
-        let k = self.ellipse.centre.y as f64;
-        let a = self.ellipse.semi_major_axis as f64;
-        let b = self.ellipse.semi_minor_axis as f64;
-
-        let theta = self.angle.to_radians();
-        let x = h + a * theta.cos();
-        let y = k + b * theta.sin();
-
-        self.angle += self.step;
-
-        Some(Position {
-            x: x.round() as i32,
-            y: y.round() as i32,
-        })
-    }
 }
 
 impl Shape for Ellipse {
@@ -66,7 +24,23 @@ impl Shape for Ellipse {
         }
     }
 
-    fn border(&self) -> impl Iterator<Item = Position> {
-        EllipseBorderIterator::new(self)
+    fn point_location(&self, point: Position) -> PointLocation {
+        let h = self.centre.x as f64;
+        let k = self.centre.y as f64;
+        let a = self.semi_major_axis as f64;
+        let b = self.semi_minor_axis as f64;
+        let x = point.x as f64;
+        let y = point.y as f64;
+
+        // Ellipse equation
+        let equation = ((x - h).powi(2) / a.powi(2)) + ((y - k).powi(2) / b.powi(2));
+
+        if (equation - 1.0).abs() < 1e-6 {
+            PointLocation::OnBorder
+        } else if equation < 1.0 {
+            PointLocation::Inside
+        } else {
+            PointLocation::Outside
+        }
     }
 }
