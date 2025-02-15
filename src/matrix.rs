@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2025 Rishabh Dwivedi (rishabhdwivedi17@gmail.com)
 
+use std::collections::VecDeque;
+
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Matrix<T> {
     m_row: usize,
@@ -72,5 +74,65 @@ impl<T> Matrix<T> {
         let coord1 = i1 * self.m_col + j1;
         let coord2 = i2 * self.m_col + j2;
         self.m_data.swap(coord1, coord2);
+    }
+
+    /// Returns raw linear data.
+    pub fn data(&self) -> &Vec<T> {
+        &self.m_data
+    }
+}
+
+impl<T> IntoIterator for Matrix<T> {
+    type Item = T;
+
+    type IntoIter = <std::vec::Vec<T> as std::iter::IntoIterator>::IntoIter;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.m_data.into_iter()
+    }
+}
+
+/// # Precondition
+///   - (i, j) is valid index in matrix.
+///
+/// # Postcondition
+///   - Flood fills matrix with new_e starting from (i, j).
+pub fn flood_fill_matrix<T: Eq + Clone>(matrix: &mut Matrix<T>, i: usize, j: usize, new_e: T) {
+    let old_e = matrix.at(i, j).clone();
+    if old_e == new_e {
+        return;
+    }
+
+    let mut stack = VecDeque::new();
+    stack.push_back((i, j));
+
+    while let Some((y, x)) = stack.pop_back() {
+        let mut x1 = x;
+
+        while x1 > 0 && *matrix.at(y, x1 - 1) == old_e {
+            x1 -= 1;
+        }
+
+        let mut span_above = false;
+        let mut span_below = false;
+
+        while x1 < matrix.col() && *matrix.at(y, x1) == old_e {
+            *matrix.at_mut(y, x1) = new_e.clone();
+
+            if !span_above && y > 0 && *matrix.at(y - 1, x1) == old_e {
+                stack.push_back((y - 1, x1));
+                span_above = true;
+            } else if span_above && y > 0 && *matrix.at(y - 1, x1) != old_e {
+                span_above = false;
+            }
+
+            if !span_below && y < matrix.row() - 1 && *matrix.at(y + 1, x1) == old_e {
+                stack.push_back((y + 1, x1));
+                span_below = true;
+            } else if span_below && y < matrix.row() - 1 && *matrix.at(y + 1, x1) != old_e {
+                span_below = false;
+            }
+            x1 += 1;
+        }
     }
 }
