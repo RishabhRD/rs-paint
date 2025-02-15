@@ -3,7 +3,7 @@
 
 use color::Color;
 use document::Document;
-use egui::{Color32, ColorImage};
+use egui::{Color32, ColorImage, ViewportBuilder};
 use paint_methods::fill_color;
 use position::Position;
 
@@ -26,7 +26,7 @@ pub struct PaintApp {
 impl PaintApp {
     fn new(_cc: &eframe::CreationContext<'_>) -> Self {
         PaintApp {
-            doc: Document::new(200, 200, Color::new(255, 255, 255)),
+            doc: Document::new(1000, 1000, Color::new(255, 255, 255)),
         }
     }
 }
@@ -66,7 +66,10 @@ impl eframe::App for PaintApp {
 }
 
 fn main() {
-    let native_options = eframe::NativeOptions::default();
+    let native_options = eframe::NativeOptions {
+        viewport: ViewportBuilder::default().with_fullscreen(true),
+        ..Default::default()
+    };
     let _ = eframe::run_native(
         "rs-paint",
         native_options,
