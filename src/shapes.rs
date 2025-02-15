@@ -9,8 +9,11 @@ pub trait Shape: Regular {
     /// Returns new shape, enclosed in given bounding box.
     fn new_inside(bounding_box: BoundingBox) -> Self;
 
-    /// Returns border of given shape.
+    /// Returns location of point wrt shape.
     fn point_location(&self, point: Position) -> PointLocation;
+
+    /// Returns bounding box of shape.
+    fn bounding_box(&self) -> BoundingBox;
 }
 
 pub mod ellipse;

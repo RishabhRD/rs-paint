@@ -43,4 +43,22 @@ impl Shape for Ellipse {
             PointLocation::Outside
         }
     }
+
+    fn bounding_box(&self) -> BoundingBox {
+        let c = self.centre;
+        let top_left_x = c.x - self.semi_major_axis;
+        let bottom_right_x = c.x + self.semi_major_axis;
+        let top_left_y = c.y - self.semi_minor_axis;
+        let bottom_right_y = c.y + self.semi_minor_axis;
+        BoundingBox {
+            top_left: Position {
+                x: top_left_x,
+                y: top_left_y,
+            },
+            bottom_right: Position {
+                x: bottom_right_x,
+                y: bottom_right_y,
+            },
+        }
+    }
 }
