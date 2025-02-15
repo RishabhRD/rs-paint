@@ -5,7 +5,7 @@ use crate::{color::Color, document::Document};
 
 /// # Class Invariant
 ///   - m_history.len() >= 1
-#[derive(Clone, PartialEq, Eq, Debug)]
+#[derive(Clone, Debug)]
 pub struct DrawingCanvas {
     /// History of document states.
     m_history: Vec<Document>,

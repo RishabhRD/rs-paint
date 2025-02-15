@@ -4,8 +4,6 @@
 use color::Color;
 use document::Document;
 use egui::{Color32, ColorImage, ViewportBuilder};
-use paint_methods::fill_color;
-use position::Position;
 
 pub mod bounding_box;
 pub mod canvas;
@@ -33,35 +31,41 @@ impl PaintApp {
 
 impl eframe::App for PaintApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        let pixels = self
-            .doc
-            .data()
-            .iter()
-            .map(|c| Color32::from_rgb(c.r, c.g, c.b))
-            .collect();
+        let mut pixels = vec![];
+        for x in 0..self.doc.width() {
+            for y in 0..self.doc.height() {
+                let c = self.doc.at(x, y);
+                pixels.push(Color32::from_rgb(c.r, c.g, c.b));
+            }
+        }
+
         let image = ColorImage {
-            size: [self.doc.cols(), self.doc.rows()],
+            size: [self.doc.width(), self.doc.height()],
             pixels,
         };
 
         let texture = ctx.load_texture("canvas", image, Default::default());
+
         egui::CentralPanel::default().show(ctx, |ui| {
             let response = ui.image(&texture);
-            if let Some(pos) = ctx.input(|i| i.pointer.interact_pos()) {
-                if response.rect.contains(pos) && ctx.input(|i| i.pointer.any_click()) {
-                    let x = (pos.x / response.rect.width() * self.doc.cols() as f32) as usize;
-                    let y = (pos.y / response.rect.height() * self.doc.rows() as f32) as usize;
+            let pointer = ctx.input(|i| i.pointer.clone());
 
-                    if x < self.doc.cols() && y < self.doc.rows() {
-                        fill_color(
-                            &mut self.doc,
-                            Position::new(x as i32, y as i32),
-                            Color::new(255, 0, 0),
-                        );
+            if let Some(pos) = pointer.interact_pos() {
+                if response.rect.contains(pos) {
+                    let x = (pos.x / response.rect.width() * self.doc.width() as f32) as usize;
+                    let y = (pos.y / response.rect.height() * self.doc.height() as f32) as usize;
+
+                    if x < self.doc.width()
+                        && y < self.doc.height()
+                        && (pointer.primary_pressed() || pointer.primary_down())
+                    {
+                        *self.doc.at_mut(x, y) = Color::red();
                     }
                 }
             }
         });
+
+        // ctx.request_repaint(); // Ensure continuous redraw while dragging
     }
 }
 
