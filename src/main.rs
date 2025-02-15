@@ -6,15 +6,16 @@ use position::Position;
 use shapes::Shape;
 
 pub mod bounding_box;
-pub mod brushes;
 pub mod canvas;
 pub mod color;
 pub mod document;
 pub mod matrix;
+pub mod paint_methods;
 pub mod point_location;
 pub mod position;
 pub mod regular;
 pub mod shapes;
+pub mod textures;
 
 fn main() {
     let circle = shapes::Ellipse {
