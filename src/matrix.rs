@@ -24,12 +24,12 @@ impl<T> Matrix<T> {
     }
 
     /// Returns number of rows in matrix
-    pub fn row(&self) -> usize {
+    pub fn rows(&self) -> usize {
         self.m_row
     }
 
     /// Returns number of columns in matrix
-    pub fn col(&self) -> usize {
+    pub fn cols(&self) -> usize {
         self.m_col
     }
 
@@ -116,7 +116,7 @@ pub fn flood_fill_matrix<T: Eq + Clone>(matrix: &mut Matrix<T>, i: usize, j: usi
         let mut span_above = false;
         let mut span_below = false;
 
-        while x1 < matrix.col() && *matrix.at(y, x1) == old_e {
+        while x1 < matrix.cols() && *matrix.at(y, x1) == old_e {
             *matrix.at_mut(y, x1) = new_e.clone();
 
             if !span_above && y > 0 && *matrix.at(y - 1, x1) == old_e {
@@ -126,10 +126,10 @@ pub fn flood_fill_matrix<T: Eq + Clone>(matrix: &mut Matrix<T>, i: usize, j: usi
                 span_above = false;
             }
 
-            if !span_below && y < matrix.row() - 1 && *matrix.at(y + 1, x1) == old_e {
+            if !span_below && y < matrix.rows() - 1 && *matrix.at(y + 1, x1) == old_e {
                 stack.push_back((y + 1, x1));
                 span_below = true;
-            } else if span_below && y < matrix.row() - 1 && *matrix.at(y + 1, x1) != old_e {
+            } else if span_below && y < matrix.rows() - 1 && *matrix.at(y + 1, x1) != old_e {
                 span_below = false;
             }
             x1 += 1;

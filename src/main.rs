@@ -40,7 +40,7 @@ impl eframe::App for PaintApp {
             .map(|c| Color32::from_rgb(c.r, c.g, c.b))
             .collect();
         let image = ColorImage {
-            size: [self.doc.col(), self.doc.row()],
+            size: [self.doc.cols(), self.doc.rows()],
             pixels,
         };
 
@@ -49,10 +49,10 @@ impl eframe::App for PaintApp {
             let response = ui.image(&texture);
             if let Some(pos) = ctx.input(|i| i.pointer.interact_pos()) {
                 if response.rect.contains(pos) && ctx.input(|i| i.pointer.any_click()) {
-                    let x = (pos.x / response.rect.width() * self.doc.col() as f32) as usize;
-                    let y = (pos.y / response.rect.height() * self.doc.row() as f32) as usize;
+                    let x = (pos.x / response.rect.width() * self.doc.cols() as f32) as usize;
+                    let y = (pos.y / response.rect.height() * self.doc.rows() as f32) as usize;
 
-                    if x < self.doc.col() && y < self.doc.row() {
+                    if x < self.doc.cols() && y < self.doc.rows() {
                         fill_color(
                             &mut self.doc,
                             Position::new(x as i32, y as i32),
